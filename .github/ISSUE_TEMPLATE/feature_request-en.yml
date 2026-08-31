@@ -1,0 +1,38 @@
+name: Feature request
+description: A template to suggest new features or improvements in English.
+title: "[FEAT]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature or improvement.
+        Please fill out the template below with as much detail as possible.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the feature or improvement you are proposing.
+      placeholder: |
+        Add a dark mode toggle to the settings screen.
+    validations:
+      required: true
+  - type: textarea
+    id: benefits
+    attributes:
+      label: Benefits
+      description: Explain the benefits of this change.
+      placeholder: |
+        Reduces eye strain for users browsing at night.
+    validations:
+      required: true
+  - type: checkboxes
+    id: check_list
+    attributes:
+      label: Checklist
+      description: Please confirm the following before submitting.
+      options:
+        - label: I have checked this is not a duplicate of an existing feature.
+        - label: The proposal is specific and clearly described.
+    validations:
+      required: true
