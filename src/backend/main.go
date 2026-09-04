@@ -2,10 +2,11 @@ package main
 
 import (
 	"github.com/YutoMaeda1209/hygge/api"
-	"github.com/YutoMaeda1209/hygge/discord"
+	"github.com/joho/godotenv"
 )
 
-func Main() {
-	go api.Api()
-	go discord.Discord()
+func main() {
+	_ = godotenv.Load()
+
+	api.Api()
 }
