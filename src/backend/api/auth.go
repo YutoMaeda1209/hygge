@@ -15,6 +15,7 @@ import (
 )
 
 const stateCookieName = "oauth_state"
+const stateCookieAge = int(time.Minute * 5 / time.Second) // 5 minutes
 
 type authSettings struct {
 	oauth        *oauth2.Config
@@ -56,7 +57,7 @@ func handleLogin(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Failed to generate state")
 		return
 	}
-	c.SetCookie(stateCookieName, state, int(time.Minute*5/time.Second), "/", "", settings.secureCookie, true)
+	c.SetCookie(stateCookieName, state, stateCookieAge, "/", "", settings.secureCookie, true)
 
 	url := settings.oauth.AuthCodeURL(state, oauth2.AccessTypeOffline)
 	c.Redirect(302, url)
