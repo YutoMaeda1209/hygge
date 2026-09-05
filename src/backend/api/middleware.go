@@ -26,13 +26,17 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		if claims, ok := token.Claims.(*claims); ok {
-			if claims.Name != "" {
-				c.String(http.StatusUnauthorized, "Invalid username")
-				c.Abort()
-				return
-			}
-			c.Next()
+		claims, ok := token.Claims.(*claims)
+		if !ok {
+			c.String(http.StatusInternalServerError, "")
+			c.Abort()
+			return
 		}
+		if claims.Name != "" {
+			c.String(http.StatusUnauthorized, "Invalid username")
+			c.Abort()
+			return
+		}
+		c.Next()
 	}
 }

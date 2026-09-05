@@ -69,8 +69,7 @@ func handleLogin(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Failed to generate state")
 		return
 	}
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie(stateCookieName, state, int(stateCookieAge/time.Second), "/", "", settings.secureCookie, true)
+	setCookie(c, stateCookieName, state, int(stateCookieAge/time.Second))
 
 	url := settings.oauth.AuthCodeURL(state, oauth2.AccessTypeOffline)
 	c.Redirect(302, url)
@@ -83,8 +82,7 @@ func handleCallback(c *gin.Context) {
 		c.String(http.StatusBadRequest, "Invalid state")
 		return
 	}
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie(stateCookieName, "", -1, "/", "", settings.secureCookie, true)
+	setCookie(c, stateCookieName, "", -1)
 
 	// Verify oauth2 authorization code
 	code := c.Query("code")
@@ -115,8 +113,7 @@ func handleCallback(c *gin.Context) {
 		return
 	}
 
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie(jwtCookieName, jwtToken, int(jwtTokenAge/time.Second), "/", "", settings.secureCookie, true)
+	setCookie(c, jwtCookieName, jwtToken, int(jwtTokenAge/time.Second))
 	c.Status(http.StatusOK)
 }
 
@@ -139,4 +136,9 @@ func generateState() (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(b), nil
+}
+
+func setCookie(ctx *gin.Context, name string, value string, maxAge int) {
+	ctx.SetSameSite(http.SameSiteLaxMode)
+	ctx.SetCookie(name, value, maxAge, "/", "", settings.secureCookie, true)
 }
