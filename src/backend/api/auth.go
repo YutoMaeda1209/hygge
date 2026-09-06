@@ -3,7 +3,8 @@ package api
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"log"
+	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"strconv"
@@ -41,12 +42,14 @@ func auth() {
 	redirectUrl := os.Getenv("OAUTH2_REDIRECT_URL")
 	secureCookie, err := strconv.ParseBool(os.Getenv("IS_HTTPS"))
 	if err != nil {
-		log.Fatalln("Failed to convert the environment variable IS_HTTPS. Set it this to either true or false.")
+		slog.Error("Failed to convert the environment variable IS_HTTPS. Set it this to either true or false.")
+		os.Exit(1)
 	}
 	jwtSecretEnv := os.Getenv("JWT_SECRET")
 
 	if clientId == "" || clientSecret == "" || redirectUrl == "" || jwtSecretEnv == "" {
-		log.Fatalln("Authentication environment variables are not set.")
+		slog.Error("Authentication environment variables are not set.")
+		os.Exit(1)
 	}
 
 	settings = authSettings{
@@ -67,6 +70,7 @@ func handleLogin(c *gin.Context) {
 	state, err := generateState()
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to generate state")
+		slog.Error(fmt.Sprintf("Failed to generate state: %s", err))
 		return
 	}
 	setCookie(c, stateCookieName, state, int(stateCookieAge/time.Second))
@@ -80,6 +84,7 @@ func handleCallback(c *gin.Context) {
 	state, err := c.Cookie(stateCookieName)
 	if err != nil || c.Query("state") != state {
 		c.String(http.StatusBadRequest, "Invalid state")
+		slog.Error(fmt.Sprintf("Invalid state: %s", err))
 		return
 	}
 	setCookie(c, stateCookieName, "", -1)
@@ -88,13 +93,15 @@ func handleCallback(c *gin.Context) {
 	code := c.Query("code")
 	if code == "" {
 		c.String(http.StatusBadRequest, "Missing code")
+		slog.Error("Missing code")
 		return
 	}
 
 	// Get token from discord
 	token, err := settings.oauth.Exchange(c.Request.Context(), code)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Failed to exchange token: %v", err)
+		c.String(http.StatusInternalServerError, "Failed to exchange token")
+		slog.Error(fmt.Sprintf("Failed to exchange token: %s", err))
 		return
 	}
 
@@ -103,18 +110,25 @@ func handleCallback(c *gin.Context) {
 	user, err := model.FetchDiscordUser(client)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to fetch discord user")
+		slog.Error(fmt.Sprintf("Failed to fetch discord user: %s", err))
 		return
 	}
 
 	// Issue a jwt for the user
 	jwtToken, err := generateJwt(user.Id)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Failed to generate jwt: %v", err)
+		c.String(http.StatusInternalServerError, "Failed to generate jwt")
+		slog.Error(fmt.Sprintf("Failed to generate jwt: %s", err))
 		return
 	}
 
 	setCookie(c, jwtCookieName, jwtToken, int(jwtTokenAge/time.Second))
 	c.Status(http.StatusOK)
+}
+
+func setCookie(ctx *gin.Context, name string, value string, maxAge int) {
+	ctx.SetSameSite(http.SameSiteLaxMode)
+	ctx.SetCookie(name, value, maxAge, "/", "", settings.secureCookie, true)
 }
 
 func generateJwt(userId string) (string, error) {
@@ -136,9 +150,4 @@ func generateState() (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(b), nil
-}
-
-func setCookie(ctx *gin.Context, name string, value string, maxAge int) {
-	ctx.SetSameSite(http.SameSiteLaxMode)
-	ctx.SetCookie(name, value, maxAge, "/", "", settings.secureCookie, true)
 }
