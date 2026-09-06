@@ -3,7 +3,6 @@ package api
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -70,7 +69,7 @@ func handleLogin(c *gin.Context) {
 	state, err := generateState()
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to generate state")
-		slog.Error(fmt.Sprintf("Failed to generate state: %s", err))
+		slog.Error("Failed to generate state", "err", err)
 		return
 	}
 	setCookie(c, stateCookieName, state, int(stateCookieAge/time.Second))
@@ -84,7 +83,7 @@ func handleCallback(c *gin.Context) {
 	state, err := c.Cookie(stateCookieName)
 	if err != nil || c.Query("state") != state {
 		c.String(http.StatusBadRequest, "Invalid state")
-		slog.Error(fmt.Sprintf("Invalid state: %s", err))
+		slog.Error("Invalid state", "err", err)
 		return
 	}
 	setCookie(c, stateCookieName, "", -1)
@@ -101,7 +100,7 @@ func handleCallback(c *gin.Context) {
 	token, err := settings.oauth.Exchange(c.Request.Context(), code)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to exchange token")
-		slog.Error(fmt.Sprintf("Failed to exchange token: %s", err))
+		slog.Error("Failed to exchange token", "err", err)
 		return
 	}
 
@@ -110,7 +109,7 @@ func handleCallback(c *gin.Context) {
 	user, err := model.FetchDiscordUser(client)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to fetch discord user")
-		slog.Error(fmt.Sprintf("Failed to fetch discord user: %s", err))
+		slog.Error("Failed to fetch discord user", "err", err)
 		return
 	}
 
@@ -118,7 +117,7 @@ func handleCallback(c *gin.Context) {
 	jwtToken, err := generateJwt(user.Id)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to generate jwt")
-		slog.Error(fmt.Sprintf("Failed to generate jwt: %s", err))
+		slog.Error("Failed to generate jwt", "err", err)
 		return
 	}
 

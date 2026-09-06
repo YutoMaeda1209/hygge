@@ -11,7 +11,10 @@ import (
 func main() {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, nil)))
 
-	_ = godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		slog.Info(".env file is not loaded.")
+	}
 
 	api.Api()
 }
