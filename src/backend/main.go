@@ -9,9 +9,9 @@ import (
 )
 
 func main() {
-	_ = godotenv.Load()
-
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, nil)))
+
+	_ = godotenv.Load()
 
 	api.Api()
 }
