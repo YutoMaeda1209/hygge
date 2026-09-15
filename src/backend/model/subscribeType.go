@@ -2,9 +2,9 @@ package model
 
 import "time"
 
-type DiscordUser struct {
+type SubscribeType struct {
 	ID        uint `gorm:"primarykey"`
-	DiscordID string
+	Label     string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

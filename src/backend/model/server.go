@@ -2,9 +2,8 @@ package model
 
 import "time"
 
-type DiscordUser struct {
+type Server struct {
 	ID        uint `gorm:"primarykey"`
-	DiscordID string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
