@@ -3,12 +3,12 @@ package model
 import "time"
 
 type ReactionRole struct {
-	ID         uint `gorm:"primarykey"`
-	ServerID   int
+	Id         uint `gorm:"primarykey"`
+	ServerId   int
 	Server     Server
-	MessageID  string
-	ReactionID string
-	RoleID     string
+	MessageId  string
+	ReactionId string
+	RoleId     string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }

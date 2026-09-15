@@ -3,8 +3,8 @@ package model
 import "time"
 
 type ContactConvo struct {
-	ID          uint `gorm:"primarykey"`
-	ContactID   int
+	Id          uint `gorm:"primarykey"`
+	ContactId   int
 	Contact     Contact
 	SendBy      int
 	DiscordUser DiscordUser `gorm:"SendBy"`

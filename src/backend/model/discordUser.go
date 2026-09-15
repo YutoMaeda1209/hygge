@@ -3,8 +3,8 @@ package model
 import "time"
 
 type DiscordUser struct {
-	ID        uint `gorm:"primarykey"`
-	DiscordID string
+	Id        uint `gorm:"primarykey"`
+	DiscordId string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

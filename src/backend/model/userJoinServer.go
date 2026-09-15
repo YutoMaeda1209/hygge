@@ -3,9 +3,9 @@ package model
 import "time"
 
 type UserJoinServer struct {
-	DiscordUserID int
+	DiscordUserId int
 	DiscordUser   DiscordUser
-	ServerID      int
+	ServerId      int
 	Server        Server
 	CreatedAt     time.Time
 	UpdatedAt     time.Time

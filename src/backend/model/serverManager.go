@@ -3,9 +3,9 @@ package model
 import "time"
 
 type ServerManager struct {
-	ServerID  int
+	ServerId  int
 	Server    Server
-	AccountID int
+	AccountId int
 	Account   Account
 	CreatedAt time.Time
 	UpdatedAt time.Time

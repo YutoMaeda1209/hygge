@@ -3,9 +3,9 @@ package model
 import "time"
 
 type GrantFuncPerm struct {
-	SubscribeTypeID int
+	SubscribeTypeId int
 	SubscribeType   SubscribeType
-	FunctionID      int
+	FunctionId      int
 	Function        Function
 	CreatedAt       time.Time
 	UpdatedAt       time.Time

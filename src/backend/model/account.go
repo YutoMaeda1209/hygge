@@ -3,10 +3,10 @@ package model
 import "time"
 
 type Account struct {
-	ID              uint `gorm:"primarykey"`
-	DiscordID       string
+	Id              uint `gorm:"primarykey"`
+	DiscordId       string
 	EmailAddress    string
-	SubscribeTypeID int
+	SubscribeTypeId int
 	SubscribeType   SubscribeType
 	CreatedAt       time.Time
 	UpdatedAt       time.Time

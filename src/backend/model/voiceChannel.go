@@ -3,10 +3,10 @@ package model
 import "time"
 
 type VoiceChannel struct {
-	ID             uint `gorm:"primarykey"`
-	ServerID       int
+	Id             uint `gorm:"primarykey"`
+	ServerId       int
 	Server         Server
-	ChannelID      string
+	ChannelId      string
 	NewChannelName string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
