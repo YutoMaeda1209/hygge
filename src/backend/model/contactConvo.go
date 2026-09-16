@@ -4,10 +4,10 @@ import "time"
 
 type ContactConvo struct {
 	Id          uint `gorm:"primarykey"`
-	ContactId   int
+	ContactId   uint
 	Contact     Contact
-	SendBy      int
-	DiscordUser DiscordUser `gorm:"SendBy"`
+	SendBy      uint
+	DiscordUser DiscordUser `gorm:"foreignKey:SendBy"`
 	Content     string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time

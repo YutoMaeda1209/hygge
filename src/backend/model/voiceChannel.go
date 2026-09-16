@@ -4,7 +4,7 @@ import "time"
 
 type VoiceChannel struct {
 	Id             uint `gorm:"primarykey"`
-	ServerId       int
+	ServerId       uint
 	Server         Server
 	ChannelId      string
 	NewChannelName string

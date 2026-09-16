@@ -3,9 +3,9 @@ package model
 import "time"
 
 type ServerManager struct {
-	ServerId  int
+	ServerId  uint `gorm:"primarykey"`
 	Server    Server
-	AccountId int
+	AccountId uint `gorm:"primarykey"`
 	Account   Account
 	CreatedAt time.Time
 	UpdatedAt time.Time

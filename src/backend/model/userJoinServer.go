@@ -3,9 +3,9 @@ package model
 import "time"
 
 type UserJoinServer struct {
-	DiscordUserId int
+	DiscordUserId uint `gorm:"primarykey"`
 	DiscordUser   DiscordUser
-	ServerId      int
+	ServerId      uint `gorm:"primarykey"`
 	Server        Server
 	CreatedAt     time.Time
 	UpdatedAt     time.Time

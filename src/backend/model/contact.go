@@ -4,9 +4,9 @@ import "time"
 
 type Contact struct {
 	Id          uint `gorm:"primarykey"`
-	IssuedBy    int
-	DiscordUser DiscordUser `gorm:"IssuedBy"`
-	ServerId    int
+	IssuedBy    uint
+	DiscordUser DiscordUser `gorm:"foreignKey:IssuedBy"`
+	ServerId    uint
 	Server      Server
 	CreatedAt   time.Time
 	UpdatedAt   time.Time

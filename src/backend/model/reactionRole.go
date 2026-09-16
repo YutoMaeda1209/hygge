@@ -4,7 +4,7 @@ import "time"
 
 type ReactionRole struct {
 	Id         uint `gorm:"primarykey"`
-	ServerId   int
+	ServerId   uint
 	Server     Server
 	MessageId  string
 	ReactionId string

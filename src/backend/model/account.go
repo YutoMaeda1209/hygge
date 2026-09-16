@@ -6,7 +6,7 @@ type Account struct {
 	Id              uint `gorm:"primarykey"`
 	DiscordId       string
 	EmailAddress    string
-	SubscribeTypeId int
+	SubscribeTypeId uint
 	SubscribeType   SubscribeType
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
