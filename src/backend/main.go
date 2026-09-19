@@ -5,15 +5,15 @@ import (
 	"os"
 
 	"github.com/YutoMaeda1209/hygge/api"
-	"github.com/joho/godotenv"
+	"github.com/YutoMaeda1209/hygge/conf"
 )
 
 func main() {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, nil)))
 
-	err := godotenv.Load()
+	err := conf.LoadConf()
 	if err != nil {
-		slog.Info(".env file is not loaded.")
+		panic(err)
 	}
 
 	api.Api()
