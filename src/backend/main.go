@@ -13,8 +13,9 @@ func main() {
 
 	err := config.LoadConf()
 	if err != nil {
-		panic(err)
+		slog.Error("Failed to load environment variables.", "err", err)
+		panic("Failed to load environment variables.")
 	}
 
-	api.Api()
+	api.RunApiEngine()
 }
