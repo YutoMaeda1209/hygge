@@ -12,7 +12,7 @@ type DiscordIdentify struct {
 	Username string `json:"username"`
 }
 
-func FetchDiscordUser(client *http.Client) (*DiscordIdentify, error) {
+func FetchDiscordIdentify(client *http.Client) (*DiscordIdentify, error) {
 	resp, err := client.Get("https://discord.com/api/users/@me")
 	if err != nil {
 		return nil, err
