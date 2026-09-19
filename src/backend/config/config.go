@@ -1,4 +1,4 @@
-package conf
+package config
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type Conf struct {
+type Config struct {
 	OAuth2ClientId     string
 	OAuth2ClientSecret string
 	OAuth2RedirectUrl  string
@@ -18,7 +18,7 @@ type Conf struct {
 	DatabaseUrl        string
 }
 
-var conf Conf
+var Conf Config
 
 func LoadConf() error {
 	err := godotenv.Load()
@@ -41,12 +41,12 @@ func LoadConf() error {
 		return errors.New("Database environment variables are not set.")
 	}
 
-	conf.OAuth2ClientId = clientId
-	conf.OAuth2ClientSecret = clientSecret
-	conf.OAuth2RedirectUrl = redirectUrl
-	conf.IsHttps = isHttps
-	conf.JwtSecret = jwtSecret
-	conf.DatabaseUrl = dbUrl
+	Conf.OAuth2ClientId = clientId
+	Conf.OAuth2ClientSecret = clientSecret
+	Conf.OAuth2RedirectUrl = redirectUrl
+	Conf.IsHttps = isHttps
+	Conf.JwtSecret = jwtSecret
+	Conf.DatabaseUrl = dbUrl
 
 	return nil
 }

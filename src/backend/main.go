@@ -5,13 +5,13 @@ import (
 	"os"
 
 	"github.com/YutoMaeda1209/hygge/api"
-	"github.com/YutoMaeda1209/hygge/conf"
+	"github.com/YutoMaeda1209/hygge/config"
 )
 
 func main() {
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, nil)))
 
-	err := conf.LoadConf()
+	err := config.LoadConf()
 	if err != nil {
 		panic(err)
 	}
