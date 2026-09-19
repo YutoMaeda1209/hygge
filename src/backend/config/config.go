@@ -38,7 +38,7 @@ func LoadConf() error {
 	} else if err != nil || jwtSecret == "" {
 		return errors.New("Jwt environment variables are not set.")
 	} else if dbUrl == "" {
-		return errors.New("Database environment variables are not set.")
+		return errors.New("The database URL has not been set. Visit https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING-KEYWORD-VALUE to configure it.")
 	}
 
 	Conf.OAuth2ClientId = clientId
