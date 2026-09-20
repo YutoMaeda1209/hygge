@@ -1,13 +1,17 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
+	"github.com/YutoMaeda1209/hygge/config"
+	"github.com/YutoMaeda1209/hygge/model"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"gorm.io/gorm"
 )
 
-func AuthMiddleware() gin.HandlerFunc {
+func authMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString, err := c.Cookie(jwtCookieName)
 		if err != nil || tokenString == "" {
@@ -17,7 +21,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		token, err := jwt.ParseWithClaims(tokenString, &claims{}, func(token *jwt.Token) (interface{}, error) {
-			return jwtSecret, nil
+			return config.Conf.JwtSecret, nil
 		})
 
 		if err != nil || !token.Valid {
@@ -32,11 +36,19 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if claims.Name != "" {
+
+		account := model.Account{}
+		err = account.Find(c, "discord_id = ?", claims.UserId)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.String(http.StatusUnauthorized, "Invalid username")
 			c.Abort()
 			return
+		} else if err != nil {
+			c.String(http.StatusInternalServerError, "")
+			c.Abort()
+			return
 		}
+
 		c.Next()
 	}
 }
