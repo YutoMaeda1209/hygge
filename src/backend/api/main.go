@@ -3,11 +3,15 @@ package api
 import (
 	"net/http"
 
+	"github.com/YutoMaeda1209/hygge/config"
 	"github.com/gin-gonic/gin"
 )
 
-func RunApiEngine() {
+func RunApiEngine() error {
 	engine := gin.Default()
+	if err := engine.SetTrustedProxies(config.Conf.TrustProxyIp); err != nil {
+		return err
+	}
 
 	// OAuth2 Endpoints
 	{
@@ -29,5 +33,5 @@ func RunApiEngine() {
 		router.GET("/me", func(ctx *gin.Context) { ctx.String(http.StatusOK, "Hello, you!") })
 	}
 
-	engine.Run()
+	return engine.Run()
 }

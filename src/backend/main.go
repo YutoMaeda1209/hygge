@@ -17,5 +17,9 @@ func main() {
 		panic("Failed to load environment variables.")
 	}
 
-	api.RunApiEngine()
+	err = api.RunApiEngine()
+	if err != nil {
+		slog.Error("Failed to run the api engine.", "err", err)
+		panic("Failed to run the api engine.")
+	}
 }

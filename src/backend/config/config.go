@@ -5,20 +5,22 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/endpoints"
 )
 
+// HS256 requires a key at least as long as the hash output (RFC 7518 3.2).
+const minJwtSecretLen = 32
+
 type Config struct {
-	OAuth2ClientId     string
-	OAuth2ClientSecret string
-	OAuth2RedirectUrl  string
-	OAuth2Config       *oauth2.Config
-	IsHttps            bool
-	JwtSecret          []byte
-	DatabaseUrl        string
+	OAuth2Config *oauth2.Config
+	IsHttps      bool
+	JwtSecret    []byte
+	DatabaseUrl  string
+	TrustProxyIp []string
 }
 
 var Conf Config
@@ -35,18 +37,18 @@ func LoadConf() error {
 	isHttps, parseBoolErr := strconv.ParseBool(os.Getenv("IS_HTTPS"))
 	jwtSecret := os.Getenv("JWT_SECRET")
 	dbUrl := os.Getenv("DB_URL")
+	trustProxyIp := os.Getenv("TRUST_PROXY_IP")
 
 	if clientId == "" || clientSecret == "" || redirectUrl == "" {
-		return errors.New("OAuth2 environment variables are not set.")
-	} else if parseBoolErr != nil || jwtSecret == "" {
-		return errors.New("Jwt environment variables are not set.")
+		return errors.New("OAuth2 environment variables are not set")
+	} else if parseBoolErr != nil {
+		return errors.New("IS_HTTPS must be set to a boolean value")
+	} else if len(jwtSecret) < minJwtSecretLen {
+		return errors.New("JWT_SECRET must be at least 32 bytes")
 	} else if dbUrl == "" {
-		return errors.New("The database URL has not been set. Visit https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING-KEYWORD-VALUE to configure it.")
+		return errors.New("the database URL has not been set; visit https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING-KEYWORD-VALUE to configure it")
 	}
 
-	Conf.OAuth2ClientId = clientId
-	Conf.OAuth2ClientSecret = clientSecret
-	Conf.OAuth2RedirectUrl = redirectUrl
 	Conf.OAuth2Config = &oauth2.Config{
 		ClientID:     clientId,
 		ClientSecret: clientSecret,
@@ -57,6 +59,15 @@ func LoadConf() error {
 	Conf.IsHttps = isHttps
 	Conf.JwtSecret = []byte(jwtSecret)
 	Conf.DatabaseUrl = dbUrl
+
+	// Format validation is left to gin's SetTrustedProxies.
+	var ips []string
+	for ip := range strings.SplitSeq(trustProxyIp, ",") {
+		if ip = strings.TrimSpace(ip); ip != "" {
+			ips = append(ips, ip)
+		}
+	}
+	Conf.TrustProxyIp = ips
 
 	return nil
 }
