@@ -6,6 +6,7 @@ import (
 
 	"github.com/YutoMaeda1209/hygge/api"
 	"github.com/YutoMaeda1209/hygge/config"
+	"github.com/YutoMaeda1209/hygge/model"
 )
 
 func main() {
@@ -15,6 +16,12 @@ func main() {
 	if err != nil {
 		slog.Error("Failed to load environment variables.", "err", err)
 		panic("Failed to load environment variables.")
+	}
+
+	err = model.InitDb()
+	if err != nil {
+		slog.Error("Failed to initialize the database.", "err", err)
+		panic("Failed to initialize the database.")
 	}
 
 	err = api.RunApiEngine()

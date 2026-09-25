@@ -1,7 +1,7 @@
 package model
 
 import (
-	"log/slog"
+	"context"
 
 	"github.com/YutoMaeda1209/hygge/config"
 	"gorm.io/driver/postgres"
@@ -10,11 +10,30 @@ import (
 
 var db *gorm.DB
 
-func InitDb() {
-	if postgresDb, err := gorm.Open(postgres.Open(config.Conf.DatabaseUrl), &gorm.Config{}); err != nil {
-		slog.Error("Failed to connect to the database.", "err", err)
-		panic("Failed to connect to the database.")
-	} else {
-		db = postgresDb
+func InitDb() error {
+	postgresDb, err := gorm.Open(postgres.Open(config.Conf.DatabaseUrl), &gorm.Config{})
+	if err != nil {
+		return err
 	}
+	db = postgresDb
+
+	err = db.AutoMigrate(
+		&SubscribeType{},
+		&Function{},
+		&GrantFuncPerm{},
+		&Account{},
+		&DiscordUser{},
+		&Server{},
+		&ServerManager{},
+		&UserJoinServer{},
+		&Contact{},
+		&ContactConvo{},
+		&ReactionRole{},
+		&VoiceChannel{},
+	)
+	if err != nil {
+		return err
+	}
+
+	return ensureFreeSubscribeType(context.Background())
 }
