@@ -1,4 +1,4 @@
-package model
+package api
 
 import (
 	"encoding/json"
@@ -7,12 +7,12 @@ import (
 	"net/http"
 )
 
-type DiscordIdentify struct {
+type discordIdentify struct {
 	Id       string `json:"id"`
 	Username string `json:"username"`
 }
 
-func FetchDiscordIdentify(client *http.Client) (*DiscordIdentify, error) {
+func fetchDiscordIdentify(client *http.Client) (*discordIdentify, error) {
 	resp, err := client.Get("https://discord.com/api/users/@me")
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func FetchDiscordIdentify(client *http.Client) (*DiscordIdentify, error) {
 		return nil, errors.New(string(body))
 	}
 
-	var user DiscordIdentify
+	var user discordIdentify
 	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
 		return nil, err
 	}

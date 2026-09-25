@@ -3,26 +3,26 @@ package api
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"errors"
 	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/YutoMaeda1209/hygge/config"
 	"github.com/YutoMaeda1209/hygge/model"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/oauth2"
-	"gorm.io/gorm"
 )
 
 const stateCookieName = "oauth_state"
 const stateCookieAge = time.Minute * 5 // 5 minutes
 const jwtCookieName = "jwt"
 const jwtTokenAge = time.Hour * 24 * 7 // 7 days
+const accountContextKey = "account"
+
+const errMsgRetry = "エラーが発生しました。もう一度やり直してください。"
+const errMsgRetryLater = "エラーが発生しました。時間を置いてやり直してください。"
 
 type claims struct {
 	UserId string `json:"user_id"`
@@ -39,15 +39,15 @@ func handleLogin(c *gin.Context) {
 	}
 	setCookie(c, stateCookieName, state, int(stateCookieAge/time.Second))
 
-	url := config.Conf.OAuth2Config.AuthCodeURL(state, oauth2.AccessTypeOffline)
+	url := config.Conf.OAuth2Config.AuthCodeURL(state)
 	c.Redirect(302, url)
 }
 
 func handleCallback(c *gin.Context) {
 	// Verify and discard state data
 	state, err := c.Cookie(stateCookieName)
-	if err != nil || c.Query("state") != state {
-		redirectErrPage(c)
+	if err != nil || state == "" || c.Query("state") != state {
+		redirectErrPage(c, errMsgRetry)
 		slog.Warn("Invalid state", "err", err)
 		return
 	}
@@ -56,7 +56,7 @@ func handleCallback(c *gin.Context) {
 	// Verify oauth2 authorization code
 	code := c.Query("code")
 	if code == "" {
-		redirectErrPage(c)
+		redirectErrPage(c, errMsgRetry)
 		slog.Warn("Missing code")
 		return
 	}
@@ -64,29 +64,25 @@ func handleCallback(c *gin.Context) {
 	// Get token from discord
 	token, err := config.Conf.OAuth2Config.Exchange(c.Request.Context(), code)
 	if err != nil {
-		redirectErrPage(c)
+		redirectErrPage(c, errMsgRetry)
 		slog.Warn("Failed to exchange token", "err", err)
 		return
 	}
 
 	// Fetch the discord user tied to the token
 	client := config.Conf.OAuth2Config.Client(c.Request.Context(), token)
-	discordIdentify, err := model.FetchDiscordIdentify(client)
+	identify, err := fetchDiscordIdentify(client)
 	if err != nil {
-		redirectErrPage(c, "エラーが発生しました。時間を置いてやり直してください。")
+		redirectErrPage(c, errMsgRetryLater)
 		slog.Error("Failed to fetch discord user", "err", err)
 		return
 	}
 
 	// Create or obtain an account
 	account := model.Account{}
-	err = account.Find(c, "discord_id = ?", discordIdentify.Id)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		account.DiscordId = discordIdentify.Id
-		err = account.Create(c)
-	}
+	err = account.EnsureByDiscordId(c.Request.Context(), identify.Id)
 	if err != nil {
-		redirectErrPage(c)
+		redirectErrPage(c, errMsgRetry)
 		slog.Error("Can not ensure an account", "err", err)
 		return
 	}
@@ -94,7 +90,7 @@ func handleCallback(c *gin.Context) {
 	// Issue a jwt for the user
 	jwtToken, err := generateJwt(strconv.FormatUint(uint64(account.Id), 10))
 	if err != nil {
-		redirectErrPage(c)
+		redirectErrPage(c, errMsgRetry)
 		slog.Error("Failed to generate jwt", "err", err)
 		return
 	}
@@ -135,17 +131,10 @@ func generateState() (string, error) {
 	return hex.EncodeToString(b), nil
 }
 
-func redirectErrPage(c *gin.Context, errs ...string) {
+func redirectErrPage(c *gin.Context, msg string) {
 	url := url.URL{Path: "/signin"}
 	query := url.Query()
-	if len(errs) == 0 {
-		errs = []string{"エラーが発生しました。もう一度やり直してください。"}
-	}
-	var builder strings.Builder
-	for _, s := range errs {
-		builder.WriteString(s)
-	}
-	query.Set("err", builder.String())
+	query.Set("err", msg)
 	url.RawQuery = query.Encode()
 	c.Redirect(302, url.String())
 }

@@ -20,9 +20,9 @@ func authMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		token, err := jwt.ParseWithClaims(tokenString, &claims{}, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(tokenString, &claims{}, func(token *jwt.Token) (any, error) {
 			return config.Conf.JwtSecret, nil
-		})
+		}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 
 		if err != nil || !token.Valid {
 			c.String(http.StatusUnauthorized, "Invalid token")
@@ -38,7 +38,7 @@ func authMiddleware() gin.HandlerFunc {
 		}
 
 		account := model.Account{}
-		err = account.Find(c, "discord_id = ?", claims.UserId)
+		err = account.Find(c.Request.Context(), "id = ?", claims.UserId)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.String(http.StatusUnauthorized, "Invalid username")
 			c.Abort()
@@ -49,6 +49,7 @@ func authMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		c.Set(accountContextKey, account)
 		c.Next()
 	}
 }
