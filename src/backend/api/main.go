@@ -30,6 +30,7 @@ func RunApiEngine() error {
 	// Require authentication paths
 	router.Use(authMiddleware())
 	{
+		router := router.Group("/user")
 		router.GET("/me", func(ctx *gin.Context) { ctx.String(http.StatusOK, "Hello, you!") })
 	}
 
