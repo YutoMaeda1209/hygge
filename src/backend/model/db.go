@@ -30,6 +30,7 @@ func InitDb() error {
 		&ContactConvo{},
 		&ReactionRole{},
 		&VoiceChannel{},
+		&Session{},
 	)
 	if err != nil {
 		return err

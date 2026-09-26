@@ -13,6 +13,8 @@ func RunApiEngine() error {
 		return err
 	}
 
+	go cleanupExpiredSessions()
+
 	// OAuth2 Endpoints
 	{
 		router := engine.Group("/auth")
