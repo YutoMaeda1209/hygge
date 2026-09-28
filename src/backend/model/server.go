@@ -9,8 +9,8 @@ import (
 )
 
 type Server struct {
-	Id        uint   `gorm:"primarykey"`
-	GuildId   string `gorm:"uniqueIndex;not null"`
+	Id        uint `gorm:"primarykey"`
+	GuildId   string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

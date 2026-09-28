@@ -9,8 +9,8 @@ import (
 )
 
 type Account struct {
-	Id           uint   `gorm:"primarykey"`
-	DiscordId    string `gorm:"unique"`
+	Id           uint `gorm:"primarykey"`
+	DiscordId    string
 	EmailAddress string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time

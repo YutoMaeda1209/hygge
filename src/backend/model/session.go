@@ -13,9 +13,9 @@ import (
 // Only the hash of the session token is stored so that a leaked table cannot be used to hijack sessions.
 type Session struct {
 	TokenHash string `gorm:"primarykey"`
-	AccountId uint   `gorm:"index;not null"`
+	AccountId uint
 	Account   Account
-	ExpiresAt time.Time `gorm:"index;not null"`
+	ExpiresAt time.Time
 	CreatedAt time.Time
 }
 

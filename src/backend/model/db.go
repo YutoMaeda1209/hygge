@@ -2,7 +2,6 @@ package model
 
 import (
 	"context"
-
 	"github.com/YutoMaeda1209/hygge/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -17,25 +16,9 @@ func InitDb() error {
 	}
 	db = postgresDb
 
-	err = db.AutoMigrate(
-		&SubscribeType{},
-		&Function{},
-		&GrantFuncPerm{},
-		&Account{},
-		&DiscordUser{},
-		&Server{},
-		&ServerManager{},
-		&Subscription{},
-		&UserJoinServer{},
-		&Contact{},
-		&ContactConvo{},
-		&ReactionRole{},
-		&VoiceChannel{},
-		&Session{},
-	)
-	if err != nil {
+	if err := runMigrations(); err != nil {
 		return err
 	}
 
-	return ensureFreeSubscribeType(context.Background())
+	return loadFreeSubscribeTypeId(context.Background())
 }
