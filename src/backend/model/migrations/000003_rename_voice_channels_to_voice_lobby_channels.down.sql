@@ -1,0 +1,11 @@
+DROP TABLE voice_lobby_rooms;
+
+ALTER TABLE voice_lobby_channels RENAME CONSTRAINT fk_voice_lobby_channels_server TO fk_voice_channels_server;
+
+ALTER TABLE voice_lobby_channels RENAME CONSTRAINT uni_voice_lobby_channels_channel_id TO uni_voice_channels_channel_id;
+
+ALTER TABLE voice_lobby_channels RENAME CONSTRAINT voice_lobby_channels_pkey TO voice_channels_pkey;
+
+ALTER SEQUENCE voice_lobby_channels_id_seq RENAME TO voice_channels_id_seq;
+
+ALTER TABLE voice_lobby_channels RENAME TO voice_channels;

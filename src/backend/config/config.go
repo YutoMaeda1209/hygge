@@ -14,6 +14,7 @@ import (
 
 type Config struct {
 	OAuth2Config *oauth2.Config
+	BotToken     string
 	IsHttps      bool
 	DatabaseUrl  string
 	TrustProxyIp []string
@@ -35,11 +36,14 @@ func LoadConf() error {
 	isHttps, parseBoolErr := strconv.ParseBool(os.Getenv("IS_HTTPS"))
 	dbUrl := os.Getenv("DB_URL")
 	trustProxyIp := os.Getenv("TRUST_PROXY_IP")
+	botToken := os.Getenv("DISCORD_BOT_TOKEN")
 
 	if clientId == "" || clientSecret == "" || redirectUrl == "" {
 		return errors.New("OAuth2 environment variables are not set")
 	} else if parseBoolErr != nil {
 		return errors.New("IS_HTTPS must be set to a boolean value")
+	} else if botToken == "" {
+		return errors.New("DISCORD_BOT_TOKEN is not set")
 	} else if dbUrl == "" {
 		return errors.New("the database URL has not been set; visit https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING-KEYWORD-VALUE to configure it")
 	}
@@ -51,6 +55,7 @@ func LoadConf() error {
 		Scopes:       []string{"identify"},
 		Endpoint:     endpoints.Discord,
 	}
+	Conf.BotToken = botToken
 	Conf.IsHttps = isHttps
 	Conf.DatabaseUrl = dbUrl
 
