@@ -25,6 +25,7 @@ func InitDb() error {
 		&DiscordUser{},
 		&Server{},
 		&ServerManager{},
+		&Subscription{},
 		&UserJoinServer{},
 		&Contact{},
 		&ContactConvo{},

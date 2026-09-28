@@ -9,13 +9,11 @@ import (
 )
 
 type Account struct {
-	Id              uint   `gorm:"primarykey"`
-	DiscordId       string `gorm:"unique"`
-	EmailAddress    string
-	SubscribeTypeId uint `gorm:"not null"`
-	SubscribeType   SubscribeType
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	Id           uint   `gorm:"primarykey"`
+	DiscordId    string `gorm:"unique"`
+	EmailAddress string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 func (account *Account) Find(ctx context.Context, query any, args ...any) error {
@@ -29,7 +27,7 @@ func (account *Account) Find(ctx context.Context, query any, args ...any) error 
 
 // EnsureByDiscordId creates the account if missing, tolerating concurrent logins of the same user.
 func (account *Account) EnsureByDiscordId(ctx context.Context, discordId string) error {
-	newAccount := Account{DiscordId: discordId, SubscribeTypeId: freeSubscribeTypeId}
+	newAccount := Account{DiscordId: discordId}
 	err := gorm.G[Account](db, clause.OnConflict{Columns: []clause.Column{{Name: "discord_id"}}, DoNothing: true}).Create(ctx, &newAccount)
 	if err != nil {
 		return err
