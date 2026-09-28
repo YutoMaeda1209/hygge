@@ -8,8 +8,8 @@ import (
 )
 
 // RunApiEngine registers the routes, starts the expired session cleanup in the background,
-// and serves HTTP on $PORT (default 8080). It blocks until the server stops.
-func RunApiEngine() error {
+// and serves HTTP on addr (default :8080). It blocks until the server stops.
+func RunApiEngine(addr ...string) error {
 	engine := gin.Default()
 	if err := engine.SetTrustedProxies(config.Conf.TrustProxyIp); err != nil {
 		return err
@@ -38,5 +38,5 @@ func RunApiEngine() error {
 		router.GET("/me", func(ctx *gin.Context) { ctx.String(http.StatusOK, "Hello, you!") })
 	}
 
-	return engine.Run()
+	return engine.Run(addr...)
 }
