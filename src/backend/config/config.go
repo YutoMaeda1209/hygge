@@ -21,6 +21,8 @@ type Config struct {
 
 var Conf Config
 
+// LoadConf loads settings from the environment (and .env if present), validates them,
+// and stores them in Conf. It returns an error if a required variable is missing or invalid.
 func LoadConf() error {
 	err := godotenv.Load()
 	if err != nil {

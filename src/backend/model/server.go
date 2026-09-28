@@ -15,8 +15,9 @@ type Server struct {
 	UpdatedAt time.Time
 }
 
-// EnsureByGuildId creates the server together with a free subscription contracted by contractorId if missing.
-// contractorId is ignored when the server already exists.
+// EnsureByGuildId loads the server with guildId into server, creating it first if it does not exist.
+// A newly created server gets a free subscription contracted by contractorId in the same transaction;
+// for an existing server, contractorId is ignored.
 func (server *Server) EnsureByGuildId(ctx context.Context, guildId string, contractorId uint) error {
 	err := db.Transaction(func(tx *gorm.DB) error {
 		newServer := Server{GuildId: guildId}

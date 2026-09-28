@@ -8,6 +8,8 @@ import (
 
 var db *gorm.DB
 
+// InitDb connects to the database at config.Conf.DatabaseUrl and applies pending migrations.
+// It must be called after config.LoadConf and before any other function in this package.
 func InitDb() error {
 	postgresDb, err := gorm.Open(postgres.Open(config.Conf.DatabaseUrl), &gorm.Config{})
 	if err != nil {

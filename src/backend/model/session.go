@@ -10,7 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Only the hash of the session token is stored so that a leaked table cannot be used to hijack sessions.
 type Session struct {
 	TokenHash string `gorm:"primarykey"`
 	AccountId uint
@@ -39,6 +38,7 @@ func CreateSession(ctx context.Context, accountId uint, age time.Duration) (stri
 }
 
 // FindSession returns the unexpired session for token with its account loaded.
+// It returns gorm.ErrRecordNotFound if the token is unknown or has expired.
 func FindSession(ctx context.Context, token string) (Session, error) {
 	return gorm.G[Session](db).
 		Preload("Account", nil).
@@ -46,6 +46,7 @@ func FindSession(ctx context.Context, token string) (Session, error) {
 		First(ctx)
 }
 
+// Extend moves the session's expiry to age from now. It is safe to call concurrently.
 func (session *Session) Extend(ctx context.Context, age time.Duration) error {
 	expiresAt := time.Now().Add(age)
 	_, err := gorm.G[Session](db).Where("token_hash = ?", session.TokenHash).Update(ctx, "expires_at", expiresAt)
@@ -56,11 +57,13 @@ func (session *Session) Extend(ctx context.Context, age time.Duration) error {
 	return nil
 }
 
+// DeleteSession revokes the session for token. Deleting an unknown token is not an error.
 func DeleteSession(ctx context.Context, token string) error {
 	_, err := gorm.G[Session](db).Where("token_hash = ?", hashSessionToken(token)).Delete(ctx)
 	return err
 }
 
+// DeleteExpiredSessions deletes all expired sessions and returns how many were deleted.
 func DeleteExpiredSessions(ctx context.Context) (int, error) {
 	return gorm.G[Session](db).Where("expires_at <= ?", time.Now()).Delete(ctx)
 }

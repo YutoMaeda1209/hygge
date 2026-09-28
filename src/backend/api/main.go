@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// RunApiEngine registers the routes, starts the expired session cleanup in the background,
+// and serves HTTP on $PORT (default 8080). It blocks until the server stops.
 func RunApiEngine() error {
 	engine := gin.Default()
 	if err := engine.SetTrustedProxies(config.Conf.TrustProxyIp); err != nil {

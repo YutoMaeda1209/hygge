@@ -10,8 +10,6 @@ import (
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 )
 
-// Schema and seed data are managed as versioned SQL migrations; GORM tags are not used to create tables.
-//
 //go:embed migrations/*.sql
 var migrationFiles embed.FS
 
