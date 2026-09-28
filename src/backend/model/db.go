@@ -1,7 +1,6 @@
 package model
 
 import (
-	"context"
 	"github.com/YutoMaeda1209/hygge/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -20,5 +19,5 @@ func InitDb() error {
 		return err
 	}
 
-	return loadFreeSubscribeTypeId(context.Background())
+	return nil
 }

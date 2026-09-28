@@ -1,28 +1,13 @@
 package model
 
-import (
-	"context"
-	"time"
+import "time"
 
-	"gorm.io/gorm"
-)
-
-const freeSubscribeTypeLabel = "free"
-
-var freeSubscribeTypeId uint
+// Must match the id seeded in migrations/000002_seed_free_subscribe_type.up.sql.
+const freeSubscribeTypeId uint = 1
 
 type SubscribeType struct {
 	Id        uint `gorm:"primarykey"`
 	Label     string
 	CreatedAt time.Time
 	UpdatedAt time.Time
-}
-
-func loadFreeSubscribeTypeId(ctx context.Context) error {
-	subscribeType, err := gorm.G[SubscribeType](db).Where("label = ?", freeSubscribeTypeLabel).First(ctx)
-	if err != nil {
-		return err
-	}
-	freeSubscribeTypeId = subscribeType.Id
-	return nil
 }
